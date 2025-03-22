@@ -1,6 +1,6 @@
 package com.recargapay.wallet.application.request
 
-data class ClientRequest(
+data class UserRequest(
     val name: String,
     val taxIdentifier: String
 )
