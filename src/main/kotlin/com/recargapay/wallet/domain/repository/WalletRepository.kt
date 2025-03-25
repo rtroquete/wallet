@@ -7,9 +7,9 @@ interface WalletRepository {
 
     fun create(wallet: WalletCreateRequest): Wallet
 
-    fun getByUserId(userId: String): Wallet
+    fun getByUserId(userId: String): Wallet?
 
-    fun getByNumber(number: Long): Wallet
+    fun getByNumber(number: Long): Wallet?
 
     fun getBalance(number: Long): BigDecimal
 

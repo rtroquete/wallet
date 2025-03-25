@@ -17,14 +17,19 @@ class WalletService(
     private val entryRepository: EntryRepository
 ) {
 
-    fun create(walletCreateRequest: WalletCreateRequest) {
+    fun create(walletCreateRequest: WalletCreateRequest): Wallet {
 
         logger.info("Creating a new wallet for ${walletCreateRequest.userId}")
 
-        val wallet = walletRepository.create(walletCreateRequest)
+        walletRepository.getByUserId(walletCreateRequest.userId)?.let {
+            logger.warn("User ${walletCreateRequest.userId} already has an existing wallet")
+            throw RuntimeException("User just have an wallet")
+        }
 
+        val wallet = walletRepository.create(walletCreateRequest)
         logger.info("Wallet ${wallet.number} created")
 
+        return wallet
     }
 
     fun balance(number: Long) {
@@ -33,12 +38,12 @@ class WalletService(
     }
 
     fun credit(entry: Entry) {
-        logger.info("Processing a credit of ${entry.value} for wallet ${entry.walletNumber}")
+        logger.info("Processing a credit of ${entry.entryValue} for wallet ${entry.walletNumber}")
         processTransaction(entry)
     }
 
     fun withdraw(entry: Entry) {
-        logger.info("Processing a withdraw of ${entry.value} for wallet ${entry.walletNumber}")
+        logger.info("Processing a withdraw of ${entry.entryValue} for wallet ${entry.walletNumber}")
         processTransaction(entry)
     }
 
@@ -46,7 +51,7 @@ class WalletService(
     fun transfer(entryOrigin: Entry, entryDestination: Entry) {
 
         logger.info(
-            "Processing a transfer of ${entryOrigin.value} " +
+            "Processing a transfer of ${entryOrigin.entryValue} " +
                 "from wallet ${entryOrigin.walletNumber} to wallet ${entryDestination.walletNumber}"
         )
 
@@ -55,26 +60,29 @@ class WalletService(
     }
 
     private fun processTransaction(entry: Entry) {
-        val wallet = walletRepository.getByNumber(entry.walletNumber)
+        walletRepository.getByNumber(entry.walletNumber)?.also { wallet ->
+            balanceValidation(wallet, entry)
 
-        balanceValidation(wallet, entry)
+            updateBalance(wallet, entry).also {
+                entryRepository.createEntry(entry.copy(balance = it.balance))
+            }
 
-        entryRepository.createEntry(entry)
-        updateBalance(wallet, entry)
+            //metric for input or output and value
+        }
 
-        //metric for input or output and value
+        throw RuntimeException("Wallet informed not found")
     }
 
     private fun updateBalance(wallet: Wallet, entry: Entry) =
         wallet.copy(
             balance = when (entry.action) {
-                Action.INPUT -> wallet.balance + entry.value
-                Action.OUTPUT -> wallet.balance - entry.value
+                Action.INPUT -> wallet.balance + entry.entryValue
+                Action.OUTPUT -> wallet.balance - entry.entryValue
             }
         ).also(walletRepository::updateBalance)
 
     private fun balanceValidation(wallet: Wallet, entry: Entry) {
-        if(entry.action == Action.OUTPUT && wallet.balance - entry.value < BigDecimal.ZERO)
+        if(entry.action == Action.OUTPUT && wallet.balance - entry.entryValue < BigDecimal.ZERO)
             throw RuntimeException("Insufficient balance")
     }
 

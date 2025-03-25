@@ -2,13 +2,11 @@ package com.recargapay.wallet.resource.database.entity
 
 import com.recargapay.wallet.domain.entity.Wallet
 import com.recargapay.wallet.domain.repository.WalletCreateRequest
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 import java.math.BigDecimal
 
 @Entity
+@Table(name = "wallet")
 data class WalletEntity(
 
     @Id
@@ -27,7 +25,6 @@ data class WalletEntity(
 
         fun fromRequest(wallet: WalletCreateRequest) =
             WalletEntity(
-                number = wallet.number,
                 userId = wallet.userId,
                 balance = BigDecimal.ZERO
             )

@@ -3,32 +3,37 @@ package com.recargapay.wallet.resource.database.entity
 import com.recargapay.wallet.domain.entity.Entry
 import com.recargapay.wallet.domain.entity.enums.Action
 import com.recargapay.wallet.domain.entity.enums.TransactionType
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
 @Entity
+@Table(name = "entry")
 data class EntryEntity(
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     val walletNumber: Long,
-    val value: BigDecimal,
+    @Column(name = "entry_value", precision = 38, scale = 2)
+    val entryValue: BigDecimal,
+    @Enumerated(EnumType.STRING)
     val transactionType: TransactionType,
+    @Enumerated(EnumType.STRING)
     val action: Action,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    @Column(name = "balance", precision = 38, scale = 2)
+    val balance: BigDecimal
 ) {
     companion object {
         fun fromDomain(entry: Entry) =
             EntryEntity(
                 walletNumber = entry.walletNumber,
-                value = entry.value,
+                entryValue = entry.entryValue,
                 transactionType = entry.transactionType,
                 action = entry.action,
-                createdAt = entry.createdAt
+                createdAt = entry.createdAt,
+                balance = entry.balance
             )
     }
 }

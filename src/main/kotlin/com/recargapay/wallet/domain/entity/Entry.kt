@@ -8,8 +8,9 @@ import java.time.LocalDateTime
 data class Entry(
     val id: Long,
     val walletNumber: Long,
-    val value: BigDecimal,
+    val entryValue: BigDecimal,
     val transactionType: TransactionType,
     val action: Action,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val balance: BigDecimal = BigDecimal.ZERO
 )

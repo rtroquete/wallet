@@ -17,13 +17,13 @@ class WalletRepositoryDatabaseImpl(
         repository.save(WalletEntity.fromRequest(wallet)).toDomain()
 
     override fun getByUserId(userId: String) =
-        repository.getByUserId(userId).toDomain()
+        repository.getByUserId(userId)?.toDomain()
 
     override fun getByNumber(number: Long) =
-        repository.getByNumber(number).toDomain()
+        repository.getByNumber(number)?.toDomain()
 
     override fun getBalance(number: Long) =
-        this.getByNumber(number).balance
+        this.getByNumber(number)?.balance ?: throw RuntimeException("Wallet informed not found")
 
     override fun updateBalance(wallet: Wallet) {
         repository.save(WalletEntity.fromDomain(wallet))
