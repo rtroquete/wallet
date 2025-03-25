@@ -1,13 +1,9 @@
 package com.recargapay.wallet.application.response
 
-data class ClientResponse(
+data class UserResponse(
     val id: String,
     val name: String,
     val taxIdentifier: String,
-    val account: Account
+    val number: Long
 )
 
-data class Account(
-    val branch: String,
-    val account: String
-)
