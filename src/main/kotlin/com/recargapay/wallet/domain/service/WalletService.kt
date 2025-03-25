@@ -5,6 +5,7 @@ import com.recargapay.wallet.domain.entity.Wallet
 import com.recargapay.wallet.domain.entity.enums.Action
 import com.recargapay.wallet.domain.entity.enums.TransactionType
 import com.recargapay.wallet.domain.entity.request.EntryCreateRequest
+import com.recargapay.wallet.domain.entity.request.TransferCreateRequest
 import com.recargapay.wallet.domain.exception.UserWalletException
 import com.recargapay.wallet.domain.repository.EntryRepository
 import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
@@ -70,7 +71,10 @@ class WalletService(
     }
 
     @Transactional
-    fun transfer(entryOrigin: Entry, entryDestination: Entry) {
+    fun transfer(transferCreateRequest: TransferCreateRequest) {
+
+        val entryOrigin = transferCreateRequest.createEntryOrigin()
+        val entryDestination = transferCreateRequest.createEntryDestination()
 
         logger.info(
             "Processing a transfer of ${entryOrigin.entryValue} " +

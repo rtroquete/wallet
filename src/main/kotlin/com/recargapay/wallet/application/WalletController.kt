@@ -1,11 +1,12 @@
 package com.recargapay.wallet.application
 
 import com.recargapay.wallet.application.request.EntryRequest
+import com.recargapay.wallet.application.request.TransferRequest
 import com.recargapay.wallet.application.request.WalletRequest
 import com.recargapay.wallet.application.response.BalanceResponse
 import com.recargapay.wallet.application.response.WalletResponse
-import com.recargapay.wallet.domain.entity.Entry
 import com.recargapay.wallet.domain.entity.request.EntryCreateRequest
+import com.recargapay.wallet.domain.entity.request.TransferCreateRequest
 import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
 import com.recargapay.wallet.domain.service.WalletService
 import org.slf4j.LoggerFactory
@@ -33,6 +34,7 @@ class WalletController(
 
     @GetMapping("number/{number}/balance")
     fun balance(@PathVariable number: Long): ResponseEntity<BalanceResponse> {
+        logger.info("Received request to get balance for wallet $number")
         return ResponseEntity.ok(BalanceResponse(walletService.balance(number)))
     }
 
@@ -44,6 +46,8 @@ class WalletController(
         @PathVariable number: Long,
         @RequestBody entryRequest: EntryRequest
     ) {
+        logger.info("Received request to credit balance for wallet $number")
+
         walletService.credit(
             EntryCreateRequest(
                 entryValue = entryRequest.entryValue,
@@ -57,6 +61,8 @@ class WalletController(
         @PathVariable number: Long,
         @RequestBody entryRequest: EntryRequest
     ) {
+        logger.info("Received request to withdraw balance for wallet $number")
+
         walletService.withdraw(
             EntryCreateRequest(
                 entryValue = entryRequest.entryValue,
@@ -66,7 +72,22 @@ class WalletController(
     }
 
     @PostMapping("number/{number}/transfer")
-    fun transfer() {}
+    fun transfer(
+        @PathVariable number: Long,
+        @RequestBody transferRequest: TransferRequest
+    ) {
+
+        logger.info("Received request to get transfer for wallet $number to ${transferRequest.walletNumber}")
+
+        walletService.transfer(
+            TransferCreateRequest(
+                walletNumberOrigin = number,
+                walletNumberDestination = transferRequest.walletNumber,
+                value = transferRequest.value
+            )
+        )
+
+    }
 
     companion object {
         private val logger = LoggerFactory.getLogger(WalletController::class.java)
