@@ -56,6 +56,7 @@ class WalletService(
         processTransaction(entry)
     }
 
+    @Transactional
     fun withdraw(entryRequest: EntryCreateRequest) {
 
         val entry = Entry(
@@ -84,6 +85,9 @@ class WalletService(
         processTransaction(entryOrigin)
         processTransaction(entryDestination)
     }
+
+    fun statement(number: Long) =
+        entryRepository.statement(number)
 
     private fun processTransaction(entry: Entry) {
         walletRepository.getByNumber(entry.walletNumber)?.also { wallet ->

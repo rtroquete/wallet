@@ -4,7 +4,10 @@ import com.recargapay.wallet.application.request.EntryRequest
 import com.recargapay.wallet.application.request.TransferRequest
 import com.recargapay.wallet.application.request.WalletRequest
 import com.recargapay.wallet.application.response.BalanceResponse
+import com.recargapay.wallet.application.response.EntryResponse
+import com.recargapay.wallet.application.response.StatementResponse
 import com.recargapay.wallet.application.response.WalletResponse
+import com.recargapay.wallet.domain.entity.Entry
 import com.recargapay.wallet.domain.entity.request.EntryCreateRequest
 import com.recargapay.wallet.domain.entity.request.TransferCreateRequest
 import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
@@ -39,7 +42,19 @@ class WalletController(
     }
 
     @GetMapping("number/{number}/statement")
-    fun statement(){}
+    fun statement(
+        @PathVariable number: Long
+    ): ResponseEntity<StatementResponse> {
+
+        val balance = walletService.balance(number)
+        val entries = walletService.statement(number)
+        return ResponseEntity.ok(
+            StatementResponse(
+                balance = balance,
+                entries = entries.map { EntryResponse.fromDomain(it) }
+            )
+        )
+    }
 
     @PostMapping("number/{number}/credit")
     fun credit(

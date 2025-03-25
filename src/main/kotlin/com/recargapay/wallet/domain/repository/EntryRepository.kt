@@ -7,4 +7,6 @@ interface EntryRepository {
     fun findAll(): List<Entry>
 
     fun createEntry(entry: Entry)
+
+    fun statement(walletNumber: Long): List<Entry>
 }

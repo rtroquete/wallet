@@ -6,6 +6,7 @@ import com.recargapay.wallet.domain.repository.WalletRepository
 import com.recargapay.wallet.resource.database.WalletJPARepository
 import com.recargapay.wallet.resource.database.entity.WalletEntity
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 
 @Repository
 class WalletRepositoryDatabaseImpl(
