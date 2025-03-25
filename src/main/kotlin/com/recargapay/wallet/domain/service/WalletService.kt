@@ -8,6 +8,7 @@ import com.recargapay.wallet.domain.entity.request.EntryCreateRequest
 import com.recargapay.wallet.domain.exception.UserWalletException
 import com.recargapay.wallet.domain.repository.EntryRepository
 import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
+import com.recargapay.wallet.domain.exception.InsufficientBalanceException
 import com.recargapay.wallet.domain.repository.WalletRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -36,9 +37,9 @@ class WalletService(
         return wallet
     }
 
-    fun balance(number: Long) {
+    fun balance(number: Long): BigDecimal {
         logger.info("Retrieving balance for wallet $number")
-        walletRepository.getBalance(number)
+        return walletRepository.getBalance(number)
     }
 
     @Transactional
@@ -54,7 +55,16 @@ class WalletService(
         processTransaction(entry)
     }
 
-    fun withdraw(entry: Entry) {
+    fun withdraw(entryRequest: EntryCreateRequest) {
+
+        val entry = Entry(
+            walletNumber = entryRequest.walletNumber,
+            entryValue = entryRequest.entryValue,
+            transactionType = TransactionType.WITHDRAW,
+            action = Action.OUTPUT,
+            createdAt = LocalDateTime.now()
+        )
+
         logger.info("Processing a withdraw of ${entry.entryValue} for wallet ${entry.walletNumber}")
         processTransaction(entry)
     }
@@ -93,7 +103,7 @@ class WalletService(
 
     private fun balanceValidation(wallet: Wallet, entry: Entry) {
         if(entry.action == Action.OUTPUT && wallet.balance - entry.entryValue < BigDecimal.ZERO)
-            throw RuntimeException("Insufficient balance")
+            throw InsufficientBalanceException("Insufficient balance")
     }
 
     companion object {

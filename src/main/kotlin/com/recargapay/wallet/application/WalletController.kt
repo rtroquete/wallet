@@ -2,6 +2,7 @@ package com.recargapay.wallet.application
 
 import com.recargapay.wallet.application.request.EntryRequest
 import com.recargapay.wallet.application.request.WalletRequest
+import com.recargapay.wallet.application.response.BalanceResponse
 import com.recargapay.wallet.application.response.WalletResponse
 import com.recargapay.wallet.domain.entity.Entry
 import com.recargapay.wallet.domain.entity.request.EntryCreateRequest
@@ -31,7 +32,9 @@ class WalletController(
     }
 
     @GetMapping("number/{number}/balance")
-    fun balance(){}
+    fun balance(@PathVariable number: Long): ResponseEntity<BalanceResponse> {
+        return ResponseEntity.ok(BalanceResponse(walletService.balance(number)))
+    }
 
     @GetMapping("number/{number}/statement")
     fun statement(){}
@@ -50,7 +53,17 @@ class WalletController(
     }
 
     @PostMapping("number/{number}/withdraw")
-    fun withdraw() {}
+    fun withdraw(
+        @PathVariable number: Long,
+        @RequestBody entryRequest: EntryRequest
+    ) {
+        walletService.withdraw(
+            EntryCreateRequest(
+                entryValue = entryRequest.entryValue,
+                walletNumber = number
+            )
+        )
+    }
 
     @PostMapping("number/{number}/transfer")
     fun transfer() {}
