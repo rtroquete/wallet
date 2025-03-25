@@ -25,6 +25,17 @@ data class EntryEntity(
     @Column(name = "balance", precision = 38, scale = 2)
     val balance: BigDecimal
 ) {
+
+    fun toDomain() = Entry(
+        id = id,
+        walletNumber = walletNumber,
+        entryValue = entryValue,
+        transactionType = transactionType,
+        action = action,
+        createdAt = createdAt,
+        balance = balance
+    )
+
     companion object {
         fun fromDomain(entry: Entry) =
             EntryEntity(

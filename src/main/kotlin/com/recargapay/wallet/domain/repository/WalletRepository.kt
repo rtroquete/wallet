@@ -1,6 +1,7 @@
 package com.recargapay.wallet.domain.repository
 
 import com.recargapay.wallet.domain.entity.Wallet
+import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
 import java.math.BigDecimal
 
 interface WalletRepository {

@@ -3,14 +3,17 @@ package com.recargapay.wallet.domain.service
 import com.recargapay.wallet.domain.entity.Entry
 import com.recargapay.wallet.domain.entity.Wallet
 import com.recargapay.wallet.domain.entity.enums.Action
+import com.recargapay.wallet.domain.entity.enums.TransactionType
+import com.recargapay.wallet.domain.entity.request.EntryCreateRequest
 import com.recargapay.wallet.domain.exception.UserWalletException
 import com.recargapay.wallet.domain.repository.EntryRepository
-import com.recargapay.wallet.domain.repository.WalletCreateRequest
+import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
 import com.recargapay.wallet.domain.repository.WalletRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.time.LocalDateTime
 
 @Service
 class WalletService(
@@ -38,7 +41,15 @@ class WalletService(
         walletRepository.getBalance(number)
     }
 
-    fun credit(entry: Entry) {
+    @Transactional
+    fun credit(entryRequest: EntryCreateRequest) {
+        val entry = Entry(
+            walletNumber = entryRequest.walletNumber,
+            entryValue = entryRequest.entryValue,
+            transactionType = TransactionType.CREDIT,
+            action = Action.INPUT,
+            createdAt = LocalDateTime.now()
+        )
         logger.info("Processing a credit of ${entry.entryValue} for wallet ${entry.walletNumber}")
         processTransaction(entry)
     }
@@ -69,9 +80,7 @@ class WalletService(
             }
 
             //metric for input or output and value
-        }
-
-        throw RuntimeException("Wallet informed not found")
+        } ?: throw RuntimeException("Wallet informed not found")
     }
 
     private fun updateBalance(wallet: Wallet, entry: Entry) =

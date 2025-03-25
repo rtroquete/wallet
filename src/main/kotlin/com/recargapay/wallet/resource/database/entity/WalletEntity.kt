@@ -1,7 +1,7 @@
 package com.recargapay.wallet.resource.database.entity
 
 import com.recargapay.wallet.domain.entity.Wallet
-import com.recargapay.wallet.domain.repository.WalletCreateRequest
+import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
 import jakarta.persistence.*
 import java.math.BigDecimal
 

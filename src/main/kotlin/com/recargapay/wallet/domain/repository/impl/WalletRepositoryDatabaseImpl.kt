@@ -1,12 +1,11 @@
 package com.recargapay.wallet.domain.repository.impl
 
 import com.recargapay.wallet.domain.entity.Wallet
-import com.recargapay.wallet.domain.repository.WalletCreateRequest
+import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
 import com.recargapay.wallet.domain.repository.WalletRepository
 import com.recargapay.wallet.resource.database.WalletJPARepository
 import com.recargapay.wallet.resource.database.entity.WalletEntity
 import org.springframework.stereotype.Repository
-import java.time.LocalDate
 
 @Repository
 class WalletRepositoryDatabaseImpl(

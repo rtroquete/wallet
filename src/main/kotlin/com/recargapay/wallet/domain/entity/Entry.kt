@@ -6,7 +6,7 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 data class Entry(
-    val id: Long,
+    val id: Long = 0 ,
     val walletNumber: Long,
     val entryValue: BigDecimal,
     val transactionType: TransactionType,

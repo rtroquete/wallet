@@ -11,6 +11,12 @@ class EntryRepositoryDatabaseImpl(
     private val repository: EntryJPARepository
 ): EntryRepository {
 
+    override fun findAll(): List<Entry> {
+        return repository.findAll().map {
+            it.toDomain()
+        }
+    }
+
     override fun createEntry(entry: Entry) {
         repository.save(EntryEntity.fromDomain(entry))
     }
