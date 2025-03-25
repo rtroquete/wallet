@@ -3,6 +3,7 @@ package com.recargapay.wallet.domain.service
 import com.recargapay.wallet.domain.entity.Entry
 import com.recargapay.wallet.domain.entity.Wallet
 import com.recargapay.wallet.domain.entity.enums.Action
+import com.recargapay.wallet.domain.exception.UserWalletException
 import com.recargapay.wallet.domain.repository.EntryRepository
 import com.recargapay.wallet.domain.repository.WalletCreateRequest
 import com.recargapay.wallet.domain.repository.WalletRepository
@@ -23,7 +24,7 @@ class WalletService(
 
         walletRepository.getByUserId(walletCreateRequest.userId)?.let {
             logger.warn("User ${walletCreateRequest.userId} already has an existing wallet")
-            throw RuntimeException("User just have an wallet")
+            throw UserWalletException("User just have an wallet")
         }
 
         val wallet = walletRepository.create(walletCreateRequest)

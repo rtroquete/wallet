@@ -5,6 +5,7 @@ import com.recargapay.wallet.application.response.WalletResponse
 import com.recargapay.wallet.domain.repository.WalletCreateRequest
 import com.recargapay.wallet.domain.service.WalletService
 import org.slf4j.LoggerFactory
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -18,10 +19,10 @@ class WalletController(
 ) {
 
     @PostMapping
-    fun create(@RequestBody request: WalletRequest): WalletResponse {
+    fun create(@RequestBody request: WalletRequest): ResponseEntity<WalletResponse> {
         logger.info("Received request to create wallet for ${request.userId}")
         return walletService.create(WalletCreateRequest(request.userId)).let {
-            WalletResponse.fromDomain(it)
+            ResponseEntity.ok(WalletResponse.fromDomain(it))
         }
     }
 
