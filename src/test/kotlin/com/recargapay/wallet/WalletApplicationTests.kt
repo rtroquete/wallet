@@ -10,4 +10,8 @@ class WalletApplicationTests {
 	fun contextLoads() {
 	}
 
+
+
+
+
 }
