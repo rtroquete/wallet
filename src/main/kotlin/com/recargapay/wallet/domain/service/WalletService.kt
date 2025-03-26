@@ -1,5 +1,6 @@
 package com.recargapay.wallet.domain.service
 
+import com.recargapay.wallet.application.config.AuditLogger
 import com.recargapay.wallet.domain.entity.Entry
 import com.recargapay.wallet.domain.entity.Wallet
 import com.recargapay.wallet.domain.entity.enums.Action
@@ -15,13 +16,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Service
 class WalletService(
     private val walletRepository: WalletRepository,
     private val entryRepository: EntryRepository
-) {
+): AuditLogger(WalletService::class.java) {
 
     fun create(walletCreateRequest: WalletCreateRequest): Wallet {
 
@@ -53,7 +55,9 @@ class WalletService(
             createdAt = LocalDateTime.now()
         )
         logger.info("Processing a credit of ${entry.entryValue} for wallet ${entry.walletNumber}")
+
         processTransaction(entry)
+        audit(entry.action.name, entry.walletNumber, entry.entryValue, entry.transactionType.name)
     }
 
     @Transactional
@@ -69,6 +73,7 @@ class WalletService(
 
         logger.info("Processing a withdraw of ${entry.entryValue} for wallet ${entry.walletNumber}")
         processTransaction(entry)
+        audit(entry.action.name, entry.walletNumber, entry.entryValue, entry.transactionType.name)
     }
 
     @Transactional
@@ -83,11 +88,15 @@ class WalletService(
         )
 
         processTransaction(entryOrigin)
+        audit(entryOrigin.action.name, entryOrigin.walletNumber, entryOrigin.entryValue, entryOrigin.transactionType.name)
         processTransaction(entryDestination)
+        audit(entryDestination.action.name, entryDestination.walletNumber, entryDestination.entryValue, entryDestination.transactionType.name)
     }
 
-    fun statement(number: Long) =
-        entryRepository.statement(number)
+    fun statement(number: Long, start: LocalDate, end: LocalDate, page: Int): List<Entry> {
+        logger.info("Retrieving statement for wallet $number")
+        return entryRepository.statement(number, start, end, page)
+    }
 
     private fun processTransaction(entry: Entry) {
         walletRepository.getByNumber(entry.walletNumber)?.also { wallet ->

@@ -25,9 +25,10 @@ class EntryRepositoryDatabaseImpl(
         repository.save(EntryEntity.fromDomain(entry))
     }
 
-    override fun statement(walletNumber: Long): List<Entry> {
+    override fun statement(walletNumber: Long, start: LocalDate, end: LocalDate, page: Int): List<Entry> {
         return repository.findEntryByWalletNumberAndCreatedAtBetween(
-            walletNumber, LocalDate.now().atStartOfDay(), LocalDateTime.of(LocalDate.now(), LocalTime.MAX), PageRequest.of(0, 10)
+            walletNumber, start.atStartOfDay(), LocalDateTime.of(end, LocalTime.MAX),
+            PageRequest.of(page, 10)
         ).toList().map { it.toDomain() }
     }
 }

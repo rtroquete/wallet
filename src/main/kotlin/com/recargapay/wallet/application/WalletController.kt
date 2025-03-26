@@ -1,5 +1,6 @@
 package com.recargapay.wallet.application
 
+import com.recargapay.wallet.application.config.AuditLogger
 import com.recargapay.wallet.application.request.EntryRequest
 import com.recargapay.wallet.application.request.TransferRequest
 import com.recargapay.wallet.application.request.WalletRequest
@@ -7,19 +8,15 @@ import com.recargapay.wallet.application.response.BalanceResponse
 import com.recargapay.wallet.application.response.EntryResponse
 import com.recargapay.wallet.application.response.StatementResponse
 import com.recargapay.wallet.application.response.WalletResponse
-import com.recargapay.wallet.domain.entity.Entry
 import com.recargapay.wallet.domain.entity.request.EntryCreateRequest
 import com.recargapay.wallet.domain.entity.request.TransferCreateRequest
 import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
 import com.recargapay.wallet.domain.service.WalletService
 import org.slf4j.LoggerFactory
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.time.LocalDate
 
 @RestController
 @RequestMapping("wallet")
@@ -43,11 +40,14 @@ class WalletController(
 
     @GetMapping("number/{number}/statement")
     fun statement(
-        @PathVariable number: Long
+        @PathVariable number: Long,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) start: LocalDate = LocalDate.now(),
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) end: LocalDate = LocalDate.now()
     ): ResponseEntity<StatementResponse> {
 
         val balance = walletService.balance(number)
-        val entries = walletService.statement(number)
+        val entries = walletService.statement(number, start, end, page)
         return ResponseEntity.ok(
             StatementResponse(
                 balance = balance,
@@ -107,6 +107,5 @@ class WalletController(
     companion object {
         private val logger = LoggerFactory.getLogger(WalletController::class.java)
     }
-
 
 }
