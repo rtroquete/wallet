@@ -2,6 +2,7 @@ package com.recargapay.wallet.application.config
 
 import com.recargapay.wallet.domain.exception.InsufficientBalanceException
 import com.recargapay.wallet.domain.exception.UserWalletException
+import com.recargapay.wallet.domain.exception.WalletNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -21,6 +22,13 @@ class GlobalExceptionHandler {
         val errorResponse = ErrorResponse("INSUFFICIENT_BALANCE_ERROR", ex.message!!)
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
     }
+
+    @ExceptionHandler(WalletNotFoundException::class)
+    fun handleWalletNotFoundException(ex: WalletNotFoundException): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse("WALLET_NOT_FOUND", ex.message!!)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+    }
+
 }
 
 data class ErrorResponse(

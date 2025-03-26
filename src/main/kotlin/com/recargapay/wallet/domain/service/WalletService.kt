@@ -7,10 +7,11 @@ import com.recargapay.wallet.domain.entity.enums.Action
 import com.recargapay.wallet.domain.entity.enums.TransactionType
 import com.recargapay.wallet.domain.entity.request.EntryCreateRequest
 import com.recargapay.wallet.domain.entity.request.TransferCreateRequest
-import com.recargapay.wallet.domain.exception.UserWalletException
-import com.recargapay.wallet.domain.repository.EntryRepository
 import com.recargapay.wallet.domain.entity.request.WalletCreateRequest
 import com.recargapay.wallet.domain.exception.InsufficientBalanceException
+import com.recargapay.wallet.domain.exception.UserWalletException
+import com.recargapay.wallet.domain.exception.WalletNotFoundException
+import com.recargapay.wallet.domain.repository.EntryRepository
 import com.recargapay.wallet.domain.repository.WalletRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -107,7 +108,7 @@ class WalletService(
             }
 
             //metric for input or output and value
-        } ?: throw RuntimeException("Wallet informed not found")
+        } ?: throw WalletNotFoundException("Wallet informed not found")
     }
 
     private fun updateBalance(wallet: Wallet, entry: Entry) =
